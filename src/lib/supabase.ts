@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Replace with your Supabase URL and anon key
-const supabaseUrl = 'https://YOUR_SUPABASE_URL.supabase.co';
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseUrl = 'https://kcowmghdgmumnkaqngiz.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtjb3dtZ2hkZ211bW5rYXFuZ2l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzOTU0ODIsImV4cCI6MjA1Njk3MTQ4Mn0.kD50v_oFQMd_wtVPBd-vUpWLQUe_12hCnSXnyF-dxCI';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -187,6 +187,27 @@ export async function getAvailableSeatsCount(busId: string) {
   
   const occupiedSeatCount = occupiedSeats?.length || 0;
   return bus.max_passengers - occupiedSeatCount;
+}
+
+export async function fetchPassengerCounts() {
+  const { data, error } = await supabase
+    .from('passengers')
+    .select('bus_id');
+
+  if (error) {
+    console.error('Error fetching passenger counts:', error);
+    throw error;
+  }
+
+  // Count passengers per bus
+  const counts: Record<string, number> = {};
+  data.forEach(({ bus_id }) => {
+    if (bus_id) {
+      counts[bus_id] = (counts[bus_id] || 0) + 1;
+    }
+  });
+
+  return counts;
 }
 
 // Subscribe to real-time updates

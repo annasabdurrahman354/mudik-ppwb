@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bus, fetchBuses, subscribeToUpdates } from '@/lib/supabase';
+import { Bus, fetchBuses, subscribeToUpdates, fetchPassengerCounts } from '@/lib/supabase';
 import BusCard from './BusCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -26,22 +26,16 @@ const BusList = () => {
   // Fetch passenger counts for each bus
   useEffect(() => {
     if (buses.length > 0) {
-      const fetchPassengerCounts = async () => {
+      const loadPassengerCounts = async () => {
         try {
-          const counts: Record<string, number> = {};
-          
-          for (const bus of buses) {
-            const { data } = await fetch(`/api/buses/${bus.id}/passengers/count`).then(res => res.json());
-            counts[bus.id] = data.count || 0;
-          }
-          
+          const counts = await fetchPassengerCounts();
           setBusPassengerCounts(counts);
         } catch (error) {
           console.error('Error fetching passenger counts:', error);
         }
       };
-      
-      fetchPassengerCounts();
+  
+      loadPassengerCounts();
     }
   }, [buses]);
   
