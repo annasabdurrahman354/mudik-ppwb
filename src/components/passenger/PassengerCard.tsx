@@ -27,11 +27,11 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
               <div>
                 <div className="flex items-center space-x-2">
                   {passenger.gender === 'L' ? (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Laki-laki</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Laki-laki</span>
                   ) : (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">Perempuan</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">Perempuan</span>
                   )}
-                  <h3 className="font-semibold text-lg">{passenger.name}</h3>
+                  <h3 className="font-medium">{passenger.name}</h3>
                 </div>
                 
                 <div className="mt-1 text-sm text-muted-foreground">
@@ -40,10 +40,10 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
                 
                 {passenger.bus && (
                   <div className="mt-3 flex items-center space-x-2">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                       Bus {passenger.bus.destination} #{passenger.bus.bus_number}
                     </span>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                       Kursi #{passenger.bus_seat_number}
                     </span>
                   </div>

@@ -33,7 +33,7 @@ const BusCard = ({ bus, passengersCount, className }: BusCardProps) => {
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                   #{bus.bus_number}
                 </span>
-                <h3 className="font-semibold text-lg">{bus.destination}</h3>
+                <h3 className="font-medium">{bus.destination}</h3>
               </div>
             </div>
             
@@ -41,7 +41,7 @@ const BusCard = ({ bus, passengersCount, className }: BusCardProps) => {
               "rounded-full h-8 w-8 flex items-center justify-center",
               isFull ? "bg-gray-200 text-gray-500" : "bg-primary/10 text-primary"
             )}>
-              <span className="text-sm font-bold">
+              <span className="text-sm font-medium">
                 {isFull ? "PENUH" : availableSeats}
               </span>
             </div>
@@ -50,15 +50,15 @@ const BusCard = ({ bus, passengersCount, className }: BusCardProps) => {
           <div className="mt-3 text-md text-muted-foreground w-full">
             <div className="flex items-center justify-between">
               <span>Kapasitas:</span>
-              <span className="font-medium">{bus.max_passengers} kursi</span>
+              <span>{bus.max_passengers} kursi</span>
             </div>
             <div className="flex items-center justify-between mt-1">
               <span>Tarif:</span>
-              <span className="font-medium">Rp. {bus.fare_per_passenger}</span>
+              <span>Rp. {bus.fare_per_passenger}</span>
             </div>
             <div className="flex items-center justify-between mt-1">
               <span>Jumlah Penumpang:</span>
-              <span className="font-medium">{passengersCount}/{bus.max_passengers}</span>
+              <span>{passengersCount}/{bus.max_passengers}</span>
             </div>
           </div>
           

@@ -12,7 +12,7 @@ const BottomNavigation = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4">
       <div className="glass shadow-xl border border-gray-100 rounded-2xl mx-auto">
-        <nav className="flex justify-evenly h-16 px-2 my-2">
+        <nav className="flex justify-evenly px-2 my-2">
           <Link 
             to="/buses" 
             className={cn(
@@ -23,13 +23,12 @@ const BottomNavigation = () => {
             {path.startsWith('/buses') && (
               <motion.span 
                 layoutId="nav-indicator"
-                className="absolute inset-0 bg-primary/10 rounded-lg"
+                className="absolute inset-0 bg-primary/10 rounded-full"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             )}
-            <Bus size={20} />
-            <span className="text-md">Bus</span>
+            <Bus size={24} className='m-1'/>
           </Link>
           <Link 
             to="/passengers" 
@@ -41,13 +40,12 @@ const BottomNavigation = () => {
             {path.startsWith('/passengers') && (
               <motion.span 
                 layoutId="nav-indicator"
-                className="absolute inset-0 bg-primary/10 rounded-lg"
+                className="absolute inset-0 bg-primary/10 rounded-full"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             )}
-            <Users size={20} />
-            <span className="text-md">Penumpang</span>
+            <Users size={24} className='m-1'/>
           </Link>
         </nav>
       </div>

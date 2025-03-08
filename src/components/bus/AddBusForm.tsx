@@ -17,8 +17,8 @@ interface AddBusFormProps {
 const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
   const [destination, setDestination] = useState<string>('');
   const [customDestination, setCustomDestination] = useState<string>('');
-  const [maxPassengers, setMaxPassengers] = useState<number>(40);
-  const [farePerPassenger, setFarePerPassenger] = useState<number>(10);
+  const [maxPassengers, setMaxPassengers] = useState<number>(50);
+  const [farePerPassenger, setFarePerPassenger] = useState<number>(100000);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const queryClient = useQueryClient();
@@ -56,8 +56,8 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
   const resetForm = () => {
     setDestination('');
     setCustomDestination('');
-    setMaxPassengers(40);
-    setFarePerPassenger(10);
+    setMaxPassengers(50);
+    setFarePerPassenger(100000);
   };
   
   return (
@@ -102,6 +102,7 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
               id="maxPassengers"
               type="number"
               min="1"
+              disabled
               max="100"
               value={maxPassengers}
               onChange={(e) => setMaxPassengers(parseInt(e.target.value))}

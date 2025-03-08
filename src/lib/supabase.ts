@@ -127,28 +127,9 @@ export async function addBus(bus: Omit<Bus, 'id' | 'created_at' | 'bus_number'>)
   return data[0] as Bus;
 }
 
-export async function addPassenger(passenger: Omit<Passenger, 'id' | 'created_at' | 'bus_seat_number' | 'total_payment'> & { bus_id: string }) {
+export async function addPassenger(passenger: Omit<Passenger, 'id' | 'created_at' | 'total_payment'> & { bus_id: string }) {
   // Get the selected bus details
   const bus = await fetchBusById(passenger.bus_id);
-  
-  // Get the next available seat for this bus
-  const { data: occupiedSeats } = await supabase
-    .from('passengers')
-    .select('bus_seat_number')
-    .eq('bus_id', passenger.bus_id)
-    .order('bus_seat_number', { ascending: true });
-  
-  // Find the next available seat number
-  let nextSeatNumber = 1;
-  const occupiedSeatNumbers = occupiedSeats?.map(seat => seat.bus_seat_number) || [];
-  
-  while (occupiedSeatNumbers.includes(nextSeatNumber) && nextSeatNumber <= bus.max_passengers) {
-    nextSeatNumber++;
-  }
-  
-  if (nextSeatNumber > bus.max_passengers) {
-    throw new Error('No seats available on this bus');
-  }
   
   // Calculate total payment based on bus fare
   const totalPayment = bus.fare_per_passenger;
@@ -157,7 +138,6 @@ export async function addPassenger(passenger: Omit<Passenger, 'id' | 'created_at
     .from('passengers')
     .insert([{ 
       ...passenger, 
-      bus_seat_number: nextSeatNumber, 
       total_payment: totalPayment 
     }])
     .select();
@@ -187,6 +167,21 @@ export async function getAvailableSeatsCount(busId: string) {
   
   const occupiedSeatCount = occupiedSeats?.length || 0;
   return bus.max_passengers - occupiedSeatCount;
+}
+
+export async function getOccupiedSeats(busId: string) {
+  const { data, error } = await supabase
+    .from('passengers')
+    .select('id, gender, bus_seat_number')
+    .eq('bus_id', busId)
+    .order('bus_seat_number', { ascending: true });
+  
+  if (error) {
+    console.error('Error fetching occupied seats:', error);
+    throw error;
+  }
+  
+  return data as { id: string; gender: 'L' | 'P'; bus_seat_number: number }[];
 }
 
 export async function fetchPassengerCounts() {

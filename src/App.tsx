@@ -36,7 +36,6 @@ const App = () => (
             <Route path="/passengers" element={<Passengers />} />
             <Route path="/passengers/:id" element={<PassengerDetail />} />
             <Route path="/tickets/:id" element={<TicketPrint />} />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
       </BrowserRouter>

@@ -27,7 +27,7 @@ const PassengerList = () => {
   // Format bus untuk seleksi
   const busOptions = buses.map(bus => ({
     id: bus.id,
-    label: `${bus.destination}#${bus.bus_number}`
+    label: `${bus.destination} #${bus.bus_number}`
   }));
   
   // Filter penumpang berdasarkan kata kunci pencarian dan bus yang dipilih
