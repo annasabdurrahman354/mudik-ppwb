@@ -50,7 +50,7 @@ const PassengerList = () => {
   }, [refetchPassengers]);
   
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full mx-auto">
       <div className="mb-6 space-y-4">
         <div className="relative">
           <Label htmlFor="search-passengers" className="block text-sm font-medium text-muted-foreground mb-2">

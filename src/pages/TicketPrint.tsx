@@ -40,7 +40,7 @@ const TicketPrint = () => {
   }
   
   return (
-    <div className="py-6 px-4">
+    <div className="py-6 px-4 container max-w-3xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

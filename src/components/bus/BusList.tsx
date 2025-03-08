@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Bus, fetchBuses, subscribeToUpdates } from '@/lib/supabase';
 import BusCard from './BusCard';
@@ -58,7 +57,7 @@ const BusList = () => {
   }, [refetch]);
   
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full mx-auto">
       <div className="mb-6">
         <label htmlFor="destination-filter" className="block text-sm font-medium text-muted-foreground mb-2">
           Filter by Destination
