@@ -93,27 +93,27 @@ const TicketView = ({ passenger }: TicketViewProps) => {
               <body>
                 <div class="ticket">
                   <div class="destination">
-                    Bus ${passenger.destination}#${passenger.bus?.bus_number || ''}
+                    Bus ${passenger.destination} #${passenger.bus?.bus_number || ''}
                   </div>
                   <div class="seat-number">
-                    SEAT ${passenger.bus_seat_number}
+                    No. ${passenger.bus_seat_number}
                   </div>
                   <div class="passenger-details">
                     <div class="detail-row">
-                      <span class="detail-label">Name:</span>
+                      <span class="detail-label">Nama:</span>
                       <span>${passenger.name}</span>
                     </div>
                     <div class="detail-row">
-                      <span class="detail-label">Group:</span>
+                      <span class="detail-label">Klp:</span>
                       <span>${passenger.group_pondok}</span>
                     </div>
                     <div class="detail-row">
-                      <span class="detail-label">Destination:</span>
+                      <span class="detail-label">Tujuan:</span>
                       <span>${passenger.destination}</span>
                     </div>
                     <div class="detail-row">
-                      <span class="detail-label">Payment:</span>
-                      <span>$${passenger.total_payment}</span>
+                      <span class="detail-label">Pembayaran:</span>
+                      <span>Rp.${passenger.total_payment}</span>
                     </div>
                   </div>
                 </div>
@@ -154,29 +154,29 @@ const TicketView = ({ passenger }: TicketViewProps) => {
         
         <div className="p-6">
           <h3 className="text-lg font-semibold text-center">
-            Bus {passenger.destination}#{passenger.bus.bus_number}
+            Bus {passenger.destination} #{passenger.bus.bus_number}
           </h3>
           
           <div className="text-[4rem] font-bold text-center my-8 text-primary">
-            SEAT {passenger.bus_seat_number}
+            No. {passenger.bus_seat_number}
           </div>
           
           <div className="border-t border-dashed border-gray-200 pt-4 space-y-2">
             <div className="flex justify-between">
-              <span className="font-medium text-muted-foreground">Name:</span>
+              <span className="font-medium text-muted-foreground">Nama:</span>
               <span>{passenger.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium text-muted-foreground">Group:</span>
+              <span className="font-medium text-muted-foreground">Klp:</span>
               <span>{passenger.group_pondok}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium text-muted-foreground">Destination:</span>
+              <span className="font-medium text-muted-foreground">Tujuan:</span>
               <span>{passenger.destination}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium text-muted-foreground">Payment:</span>
-              <span>${passenger.total_payment}</span>
+              <span className="font-medium text-muted-foreground">Total Pembayaran:</span>
+              <span>Rp. {passenger.total_payment}</span>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ const TicketView = ({ passenger }: TicketViewProps) => {
           className="px-6"
         >
           <PrinterIcon className="mr-2 h-4 w-4" />
-          {isPrinting ? 'Preparing to print...' : 'Print Ticket'}
+          {isPrinting ? 'Mempersiapkan pencetakan...' : 'Cetak Tiket'}
         </Button>
       </div>
     </div>

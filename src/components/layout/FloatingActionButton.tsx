@@ -13,7 +13,7 @@ const FloatingActionButton = ({ onClick, className }: FloatingActionButtonProps)
     <motion.button
       onClick={onClick}
       className={cn(
-        "fab fixed z-40 right-6 bottom-24 w-14 h-14 bg-primary text-primary-foreground",
+        "fab fixed z-40 right-4 bottom-28 w-12 h-12 bg-primary text-primary-foreground shadow-xl",
         className
       )}
       whileHover={{ scale: 1.05 }}

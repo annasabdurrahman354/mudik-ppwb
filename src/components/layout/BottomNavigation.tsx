@@ -3,6 +3,7 @@ import { Bus, Users } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import FloatingActionButton from './FloatingActionButton';
 
 const BottomNavigation = () => {
   const location = useLocation();
@@ -10,8 +11,8 @@ const BottomNavigation = () => {
   
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4">
-      <div className="glass shadow-xl border border-gray-100 rounded-2xl mx-auto max-w-md">
-        <nav className="flex justify-around h-16 px-2">
+      <div className="glass shadow-xl border border-gray-100 rounded-2xl mx-auto">
+        <nav className="flex justify-evenly h-16 px-2 my-2">
           <Link 
             to="/buses" 
             className={cn(
@@ -28,7 +29,7 @@ const BottomNavigation = () => {
               />
             )}
             <Bus size={20} />
-            <span className="text-xs font-medium">Buses</span>
+            <span className="text-md">Bus</span>
           </Link>
           <Link 
             to="/passengers" 
@@ -46,7 +47,7 @@ const BottomNavigation = () => {
               />
             )}
             <Users size={20} />
-            <span className="text-xs font-medium">Passengers</span>
+            <span className="text-md">Penumpang</span>
           </Link>
         </nav>
       </div>

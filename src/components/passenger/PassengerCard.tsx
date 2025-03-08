@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Passenger } from '@/lib/supabase';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,24 +27,24 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
               <div>
                 <div className="flex items-center space-x-2">
                   {passenger.gender === 'L' ? (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Male</span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Laki-laki</span>
                   ) : (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">Female</span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">Perempuan</span>
                   )}
                   <h3 className="font-semibold text-lg">{passenger.name}</h3>
                 </div>
                 
                 <div className="mt-1 text-sm text-muted-foreground">
-                  <p>Group: {passenger.group_pondok}</p>
+                  <p>Kelompok: {passenger.group_pondok}</p>
                 </div>
                 
                 {passenger.bus && (
                   <div className="mt-3 flex items-center space-x-2">
                     <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                      Bus {passenger.bus.destination}#{passenger.bus.bus_number}
+                      Bus {passenger.bus.destination} #{passenger.bus.bus_number}
                     </span>
                     <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                      Seat #{passenger.bus_seat_number}
+                      Kursi #{passenger.bus_seat_number}
                     </span>
                   </div>
                 )}

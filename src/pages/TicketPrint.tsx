@@ -20,7 +20,7 @@ const TicketPrint = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse-light text-center">
-          <p className="text-muted-foreground">Loading ticket...</p>
+          <p className="text-muted-foreground">Memuat penumpang...</p>
         </div>
       </div>
     );
@@ -30,9 +30,9 @@ const TicketPrint = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive mb-4">Failed to load ticket</p>
+          <p className="text-destructive mb-4">Gagal memuat data penumpang</p>
           <Button asChild>
-            <Link to="/passengers">Return to Passengers</Link>
+            <Link to="/passengers">Kembali ke Daftar Penumpang</Link>
           </Button>
         </div>
       </div>
@@ -40,7 +40,7 @@ const TicketPrint = () => {
   }
   
   return (
-    <div className="py-6 px-4 container max-w-3xl mx-auto">
+    <div className="py-6 px-8 pt-8 container w-full mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ const TicketPrint = () => {
               <ArrowLeft size={20} />
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold">Ticket</h1>
+          <h1 className="text-2xl font-bold">Tiket</h1>
         </div>
         
         <TicketView passenger={passenger} />

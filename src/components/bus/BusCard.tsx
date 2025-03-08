@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { Bus } from '@/lib/supabase';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,34 +35,34 @@ const BusCard = ({ bus, passengersCount, className }: BusCardProps) => {
                 </span>
                 <h3 className="font-semibold text-lg">{bus.destination}</h3>
               </div>
-              
-              <div className="mt-3 text-sm text-muted-foreground">
-                <div className="flex items-center justify-between">
-                  <span>Capacity:</span>
-                  <span className="font-medium">{bus.max_passengers} seats</span>
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span>Fare:</span>
-                  <span className="font-medium">${bus.fare_per_passenger}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span>Passengers:</span>
-                  <span className="font-medium">{passengersCount}/{bus.max_passengers}</span>
-                </div>
-              </div>
             </div>
             
             <div className={cn(
-              "rounded-full h-12 w-12 flex items-center justify-center",
+              "rounded-full h-8 w-8 flex items-center justify-center",
               isFull ? "bg-gray-200 text-gray-500" : "bg-primary/10 text-primary"
             )}>
               <span className="text-sm font-bold">
-                {isFull ? "FULL" : availableSeats}
+                {isFull ? "PENUH" : availableSeats}
               </span>
             </div>
           </div>
+
+          <div className="mt-3 text-md text-muted-foreground w-full">
+            <div className="flex items-center justify-between">
+              <span>Kapasitas:</span>
+              <span className="font-medium">{bus.max_passengers} kursi</span>
+            </div>
+            <div className="flex items-center justify-between mt-1">
+              <span>Tarif:</span>
+              <span className="font-medium">Rp. {bus.fare_per_passenger}</span>
+            </div>
+            <div className="flex items-center justify-between mt-1">
+              <span>Jumlah Penumpang:</span>
+              <span className="font-medium">{passengersCount}/{bus.max_passengers}</span>
+            </div>
+          </div>
           
-          {/* Progress bar for seat occupancy */}
+          {/* Bilah progres untuk okupansi kursi */}
           <div className="mt-4 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
             <div 
               className={cn(

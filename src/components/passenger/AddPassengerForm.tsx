@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -44,8 +43,8 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
         
         setBusAvailability(availability);
       } catch (error) {
-        console.error('Error loading buses:', error);
-        toast.error('Failed to load buses');
+        console.error('Gagal memuat bus:', error);
+        toast.error('Gagal memuat daftar bus');
       }
     };
     
@@ -59,11 +58,10 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     setIsLoading(true);
     
     try {
-      // Get bus destination
       const selectedBus = buses.find(bus => bus.id === busId);
       
       if (!selectedBus) {
-        toast.error('Please select a valid bus');
+        toast.error('Silakan pilih bus yang valid');
         return;
       }
       
@@ -76,14 +74,14 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
         bus_id: busId
       });
       
-      toast.success('Passenger added successfully');
+      toast.success('Penumpang berhasil ditambahkan');
       queryClient.invalidateQueries({ queryKey: ['passengers'] });
       queryClient.invalidateQueries({ queryKey: ['buses'] });
       resetForm();
       onClose();
     } catch (error) {
-      console.error('Error adding passenger:', error);
-      toast.error('Failed to add passenger');
+      console.error('Gagal menambahkan penumpang:', error);
+      toast.error('Gagal menambahkan penumpang');
     } finally {
       setIsLoading(false);
     }
@@ -101,63 +99,63 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Passenger</DialogTitle>
+          <DialogTitle>Tambahkan Penumpang Baru</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Nama Lengkap</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter full name"
+              placeholder="Masukkan nama lengkap"
               required
             />
           </div>
           
           <div className="space-y-2">
-            <Label>Gender</Label>
+            <Label>Jenis Kelamin</Label>
             <RadioGroup value={gender} onValueChange={(value) => setGender(value as 'L' | 'P')} className="flex space-x-4">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="L" id="male" />
-                <Label htmlFor="male">Male (L)</Label>
+                <Label htmlFor="male">Laki-laki (L)</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="P" id="female" />
-                <Label htmlFor="female">Female (P)</Label>
+                <Label htmlFor="female">Perempuan (P)</Label>
               </div>
             </RadioGroup>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address">Alamat</Label>
             <Textarea
               id="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter address"
+              placeholder="Masukkan alamat"
               required
               rows={3}
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="groupPondok">Group Pondok</Label>
+            <Label htmlFor="groupPondok">Kelompok Pondok</Label>
             <Input
               id="groupPondok"
               value={groupPondok}
               onChange={(e) => setGroupPondok(e.target.value)}
-              placeholder="Enter group name"
+              placeholder="Masukkan nama kelompok"
               required
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="bus">Select Bus</Label>
+            <Label htmlFor="bus">Pilih Bus</Label>
             <Select value={busId} onValueChange={setBusId}>
               <SelectTrigger id="bus">
-                <SelectValue placeholder="Select a bus" />
+                <SelectValue placeholder="Pilih bus" />
               </SelectTrigger>
               <SelectContent>
                 {buses.map(bus => {
@@ -168,10 +166,10 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
                       value={bus.id}
                       disabled={!isAvailable}
                     >
-                      {`${bus.destination}#${bus.bus_number}`}
+                      {`${bus.destination}#${bus.bus_number}`} 
                       {isAvailable 
-                        ? ` (${busAvailability[bus.id]} seats available)` 
-                        : ' (FULL)'}
+                        ? ` (${busAvailability[bus.id]} kursi tersedia)` 
+                        : ' (PENUH)'}
                     </SelectItem>
                   );
                 })}
@@ -179,17 +177,17 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
             </Select>
             {buses.length === 0 && (
               <p className="text-sm text-muted-foreground mt-2">
-                No buses available. Please add a bus first.
+                Tidak ada bus tersedia. Silakan tambahkan bus terlebih dahulu.
               </p>
             )}
           </div>
           
           <DialogFooter>
             <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
+              Batal
             </Button>
             <Button type="submit" disabled={isLoading || buses.length === 0}>
-              {isLoading ? 'Adding...' : 'Add Passenger'}
+              {isLoading ? 'Menambahkan...' : 'Tambah Penumpang'}
             </Button>
           </DialogFooter>
         </form>

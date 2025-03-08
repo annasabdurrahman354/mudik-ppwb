@@ -64,7 +64,7 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Bus</DialogTitle>
+          <DialogTitle>Tambahkan Bus Baru</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
@@ -72,32 +72,32 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
             <Label htmlFor="destination">Destination</Label>
             <Select value={destination} onValueChange={setDestination}>
               <SelectTrigger id="destination">
-                <SelectValue placeholder="Select destination" />
+                <SelectValue placeholder="Pilih Tujuan" />
               </SelectTrigger>
               <SelectContent>
                 {PREDEFINED_DESTINATIONS.map(dest => (
                   <SelectItem key={dest} value={dest}>{dest}</SelectItem>
                 ))}
-                <SelectItem value="custom">Custom Destination</SelectItem>
+                <SelectItem value="custom">Tujuan Kustom</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           {destination === 'custom' && (
             <div className="space-y-2">
-              <Label htmlFor="customDestination">Custom Destination</Label>
+              <Label htmlFor="customDestination">Tujuan Kustom</Label>
               <Input
                 id="customDestination"
                 value={customDestination}
                 onChange={(e) => setCustomDestination(e.target.value)}
-                placeholder="Enter custom destination"
+                placeholder="Masukkan tujuan kustom"
                 required
               />
             </div>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="maxPassengers">Maximum Passengers</Label>
+            <Label htmlFor="maxPassengers">Maksimal Penumpang</Label>
             <Input
               id="maxPassengers"
               type="number"
@@ -110,7 +110,7 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="farePerPassenger">Fare per Passenger ($)</Label>
+            <Label htmlFor="farePerPassenger">Tarif per Penumpang (Rp)</Label>
             <Input
               id="farePerPassenger"
               type="number"
@@ -126,7 +126,7 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Adding...' : 'Add Bus'}
+              {isLoading ? 'Menambahkan...' : 'Tambahkan Bus'}
             </Button>
           </DialogFooter>
         </form>

@@ -21,7 +21,7 @@ const PassengerDetail = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse-light text-center">
-          <p className="text-muted-foreground">Loading passenger details...</p>
+          <p className="text-muted-foreground">Memuat data penumpang...</p>
         </div>
       </div>
     );
@@ -29,11 +29,11 @@ const PassengerDetail = () => {
   
   if (error || !passenger) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center ">
         <div className="text-center">
-          <p className="text-destructive mb-4">Failed to load passenger details</p>
+          <p className="text-destructive mb-4">Gagal memuat data penumpang</p>
           <Button asChild>
-            <Link to="/passengers">Return to Passengers</Link>
+            <Link to="/passengers">Kembali ke Daftar Penumpang</Link>
           </Button>
         </div>
       </div>
@@ -41,7 +41,7 @@ const PassengerDetail = () => {
   }
   
   return (
-    <div className="pb-20 px-4 container max-w-3xl mx-auto">
+    <div className="pb-20 px-8 pt-4 container w-full mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,7 +54,7 @@ const PassengerDetail = () => {
               <ArrowLeft size={20} />
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold">Passenger Details</h1>
+          <h1 className="text-2xl font-bold">Detail Penumpang</h1>
         </div>
         
         <Card className="mb-6">
@@ -66,23 +66,23 @@ const PassengerDetail = () => {
                   ? 'bg-blue-100 text-blue-700' 
                   : 'bg-pink-100 text-pink-700'
               }`}>
-                {passenger.gender === 'L' ? 'Male' : 'Female'}
+                {passenger.gender === 'L' ? 'Laki-laki' : 'Perempuan'}
               </span>
             </div>
             
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b pb-2">
-                <span className="text-muted-foreground">Address</span>
+                <span className="text-muted-foreground">Alamat</span>
                 <span className="font-medium text-right">{passenger.address}</span>
               </div>
               
               <div className="flex justify-between border-b pb-2">
-                <span className="text-muted-foreground">Destination</span>
+                <span className="text-muted-foreground">Tujuan</span>
                 <span className="font-medium">{passenger.destination}</span>
               </div>
               
               <div className="flex justify-between border-b pb-2">
-                <span className="text-muted-foreground">Group</span>
+                <span className="text-muted-foreground">Kelompok</span>
                 <span className="font-medium">{passenger.group_pondok}</span>
               </div>
               
@@ -91,18 +91,18 @@ const PassengerDetail = () => {
                   <div className="flex justify-between border-b pb-2">
                     <span className="text-muted-foreground">Bus</span>
                     <span className="font-medium">
-                      {passenger.bus.destination}#{passenger.bus.bus_number}
+                      {passenger.bus.destination} #{passenger.bus.bus_number}
                     </span>
                   </div>
                   
                   <div className="flex justify-between border-b pb-2">
-                    <span className="text-muted-foreground">Seat Number</span>
+                    <span className="text-muted-foreground">Nomor Penumpang</span>
                     <span className="font-medium">#{passenger.bus_seat_number}</span>
                   </div>
                   
                   <div className="flex justify-between pt-1">
-                    <span className="text-muted-foreground">Total Payment</span>
-                    <span className="font-semibold text-primary">${passenger.total_payment}</span>
+                    <span className="text-muted-foreground">Total Pembayaran</span>
+                    <span className="font-semibold text-primary">Rp. {passenger.total_payment}</span>
                   </div>
                 </>
               )}
@@ -114,7 +114,7 @@ const PassengerDetail = () => {
           <Button asChild>
             <Link to={`/tickets/${passenger.id}`}>
               <TicketIcon className="mr-2 h-4 w-4" />
-              View & Print Ticket
+              Tampilkan & Cetak Tiket
             </Link>
           </Button>
         </div>

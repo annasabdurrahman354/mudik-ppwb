@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Passenger, fetchPassengers, fetchBuses, Bus, subscribeToUpdates } from '@/lib/supabase';
 import PassengerCard from './PassengerCard';
@@ -13,32 +12,32 @@ const PassengerList = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedBus, setSelectedBus] = useState<string>('all');
   
-  // Fetch passengers
+  // Ambil data penumpang
   const { data: passengers = [], isLoading: isLoadingPassengers, refetch: refetchPassengers } = useQuery({
     queryKey: ['passengers'],
     queryFn: fetchPassengers
   });
   
-  // Fetch buses
+  // Ambil data bus
   const { data: buses = [] } = useQuery({
     queryKey: ['buses'],
     queryFn: fetchBuses
   });
   
-  // Format buses for selection
+  // Format bus untuk seleksi
   const busOptions = buses.map(bus => ({
     id: bus.id,
     label: `${bus.destination}#${bus.bus_number}`
   }));
   
-  // Filter passengers based on search term and selected bus
+  // Filter penumpang berdasarkan kata kunci pencarian dan bus yang dipilih
   const filteredPassengers = passengers.filter(passenger => {
     const matchesSearch = passenger.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBus = selectedBus === 'all' || passenger.bus_id === selectedBus;
     return matchesSearch && matchesBus;
   });
   
-  // Subscribe to real-time updates
+  // Berlangganan pembaruan real-time
   useEffect(() => {
     const subscription = subscribeToUpdates('passengers', (payload) => {
       refetchPassengers();
@@ -54,7 +53,7 @@ const PassengerList = () => {
       <div className="mb-6 space-y-4">
         <div className="relative">
           <Label htmlFor="search-passengers" className="block text-sm font-medium text-muted-foreground mb-2">
-            Search Passengers
+            Cari Penumpang
           </Label>
           <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -62,7 +61,7 @@ const PassengerList = () => {
               id="search-passengers"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name..."
+              placeholder="Cari berdasarkan nama..."
               className="pl-10"
             />
           </div>
@@ -70,14 +69,14 @@ const PassengerList = () => {
         
         <div>
           <Label htmlFor="bus-filter" className="block text-sm font-medium text-muted-foreground mb-2">
-            Filter by Bus
+            Filter berdasarkan Bus
           </Label>
           <Select value={selectedBus} onValueChange={setSelectedBus}>
             <SelectTrigger id="bus-filter" className="w-full">
-              <SelectValue placeholder="All Buses" />
+              <SelectValue placeholder="Semua Bus" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Buses</SelectItem>
+              <SelectItem value="all">Semua Bus</SelectItem>
               {busOptions.map(bus => (
                 <SelectItem key={bus.id} value={bus.id}>
                   {bus.label}
@@ -113,7 +112,7 @@ const PassengerList = () => {
               animate={{ opacity: 1 }}
               className="p-8 text-center"
             >
-              <p className="text-muted-foreground">No passengers found</p>
+              <p className="text-muted-foreground">Tidak ada penumpang yang ditemukan</p>
             </motion.div>
           )}
         </AnimatePresence>

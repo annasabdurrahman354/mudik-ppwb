@@ -6,24 +6,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
 const BusList = () => {
-  const [selectedDestination, setSelectedDestination] = useState<string>('all');
+  const [selectedDestination, setSelectedDestination] = useState<string>('semua');
   const [busPassengerCounts, setBusPassengerCounts] = useState<Record<string, number>>({});
   
-  // Fetch buses
+  // Ambil data bus
   const { data: buses = [], isLoading, refetch } = useQuery({
     queryKey: ['buses'],
     queryFn: fetchBuses
   });
   
-  // Get unique destinations
-  const destinations = ['all', ...new Set(buses.map(bus => bus.destination))].sort();
+  // Dapatkan destinasi unik
+  const destinations = ['semua', ...new Set(buses.map(bus => bus.destination))].sort();
   
-  // Filter buses based on selected destination
-  const filteredBuses = selectedDestination === 'all'
+  // Filter bus berdasarkan destinasi yang dipilih
+  const filteredBuses = selectedDestination === 'semua'
     ? buses
     : buses.filter(bus => bus.destination === selectedDestination);
   
-  // Fetch passenger counts for each bus
+  // Ambil jumlah penumpang untuk setiap bus
   useEffect(() => {
     if (buses.length > 0) {
       const loadPassengerCounts = async () => {
@@ -31,7 +31,7 @@ const BusList = () => {
           const counts = await fetchPassengerCounts();
           setBusPassengerCounts(counts);
         } catch (error) {
-          console.error('Error fetching passenger counts:', error);
+          console.error('Error mengambil jumlah penumpang:', error);
         }
       };
   
@@ -39,7 +39,7 @@ const BusList = () => {
     }
   }, [buses]);
   
-  // Subscribe to real-time updates
+  // Berlangganan pembaruan real-time
   useEffect(() => {
     const subscription = subscribeToUpdates('buses', (payload) => {
       refetch();
@@ -54,16 +54,16 @@ const BusList = () => {
     <div className="w-full mx-auto">
       <div className="mb-6">
         <label htmlFor="destination-filter" className="block text-sm font-medium text-muted-foreground mb-2">
-          Filter by Destination
+          Filter Berdasarkan Destinasi
         </label>
         <Select value={selectedDestination} onValueChange={setSelectedDestination}>
           <SelectTrigger id="destination-filter" className="w-full">
-            <SelectValue placeholder="All Destinations" />
+            <SelectValue placeholder="Semua Destinasi" />
           </SelectTrigger>
           <SelectContent>
             {destinations.map(destination => (
               <SelectItem key={destination} value={destination}>
-                {destination === 'all' ? 'All Destinations' : destination}
+                {destination === 'semua' ? 'Semua Destinasi' : destination}
               </SelectItem>
             ))}
           </SelectContent>
@@ -99,7 +99,7 @@ const BusList = () => {
               animate={{ opacity: 1 }}
               className="p-8 text-center"
             >
-              <p className="text-muted-foreground">No buses found</p>
+              <p className="text-muted-foreground">Tidak ada bus yang ditemukan</p>
             </motion.div>
           )}
         </AnimatePresence>
