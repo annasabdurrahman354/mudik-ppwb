@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Passenger, fetchPassengers, fetchBuses, Bus, subscribeToUpdates } from '@/lib/supabase';
 import PassengerCard from './PassengerCard';
@@ -11,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 const PassengerList = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedBus, setSelectedBus] = useState<string>('all');
+  const [selectedGender, setSelectedGender] = useState<string>('all');
   
   // Ambil data penumpang
   const { data: passengers = [], isLoading: isLoadingPassengers, refetch: refetchPassengers } = useQuery({
@@ -30,11 +32,12 @@ const PassengerList = () => {
     label: `${bus.destination} #${bus.bus_number}`
   }));
   
-  // Filter penumpang berdasarkan kata kunci pencarian dan bus yang dipilih
+  // Filter penumpang berdasarkan kata kunci pencarian, bus yang dipilih, dan gender
   const filteredPassengers = passengers.filter(passenger => {
     const matchesSearch = passenger.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBus = selectedBus === 'all' || passenger.bus_id === selectedBus;
-    return matchesSearch && matchesBus;
+    const matchesGender = selectedGender === 'all' || passenger.gender === selectedGender;
+    return matchesSearch && matchesBus && matchesGender;
   });
   
   // Berlangganan pembaruan real-time
@@ -67,23 +70,41 @@ const PassengerList = () => {
           </div>
         </div>
         
-        <div>
-          <Label htmlFor="bus-filter" className="block text-sm font-medium text-muted-foreground mb-2">
-            Filter berdasarkan Bus
-          </Label>
-          <Select value={selectedBus} onValueChange={setSelectedBus}>
-            <SelectTrigger id="bus-filter" className="w-full">
-              <SelectValue placeholder="Semua Bus" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Bus</SelectItem>
-              {busOptions.map(bus => (
-                <SelectItem key={bus.id} value={bus.id}>
-                  {bus.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="bus-filter" className="block text-sm font-medium text-muted-foreground mb-2">
+              Filter berdasarkan Bus
+            </Label>
+            <Select value={selectedBus} onValueChange={setSelectedBus}>
+              <SelectTrigger id="bus-filter" className="w-full">
+                <SelectValue placeholder="Semua Bus" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Bus</SelectItem>
+                {busOptions.map(bus => (
+                  <SelectItem key={bus.id} value={bus.id}>
+                    {bus.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="gender-filter" className="block text-sm font-medium text-muted-foreground mb-2">
+              Filter berdasarkan Gender
+            </Label>
+            <Select value={selectedGender} onValueChange={setSelectedGender}>
+              <SelectTrigger id="gender-filter" className="w-full">
+                <SelectValue placeholder="Semua Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Gender</SelectItem>
+                <SelectItem value="L">Laki-laki</SelectItem>
+                <SelectItem value="P">Perempuan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       
