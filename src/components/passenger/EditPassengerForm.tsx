@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { Passenger, fetchBuses, PREDEFINED_DESTINATIONS, supabase } from '@/lib/supabase';
+import { Passenger, fetchBuses, supabase, getOccupiedSeats } from '@/lib/supabase';
+import BusSeatSelector from './BusSeatSelector';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +19,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 interface EditPassengerFormProps {
@@ -39,11 +38,14 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
   const [destination, setDestination] = useState(passenger.destination);
   const [groupPondok, setGroupPondok] = useState(passenger.group_pondok);
   const [busId, setBusId] = useState(passenger.bus_id || '');
+  const [selectedSeatNumber, setSelectedSeatNumber] = useState<number | null>(passenger.bus_seat_number || null);
   
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [buses, setBuses] = useState<{id: string; label: string}[]>([]);
+  const [occupiedSeats, setOccupiedSeats] = useState<any[]>([]);
+  const [fetchingSeats, setFetchingSeats] = useState<boolean>(false);
   
   // Reset form when passenger changes
   useEffect(() => {
@@ -54,8 +56,20 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
       setDestination(passenger.destination);
       setGroupPondok(passenger.group_pondok);
       setBusId(passenger.bus_id || '');
+      setSelectedSeatNumber(passenger.bus_seat_number || null);
     }
   }, [passenger]);
+  
+  // Reset selected seat when bus changes
+  useEffect(() => {
+    // Only reset if the bus changes from the passenger's original bus
+    if (busId !== passenger.bus_id) {
+      setSelectedSeatNumber(null);
+    } else {
+      // Restore original seat if returning to original bus
+      setSelectedSeatNumber(passenger.bus_seat_number || null);
+    }
+  }, [busId, passenger.bus_id, passenger.bus_seat_number]);
   
   // Load buses for select dropdown
   useEffect(() => {
@@ -82,9 +96,52 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
     }
   }, [isOpen, toast]);
   
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
+  // Fetch occupied seats when bus is selected
+  useEffect(() => {
+    const fetchBusSeats = async () => {
+      if (!busId || busId === 'none') {
+        setOccupiedSeats([]);
+        return;
+      }
+      
+      setFetchingSeats(true);
+      try {
+        const seats = await getOccupiedSeats(busId);
+        // Filter out the current passenger's seat
+        const filteredSeats = seats.filter(seat => seat.id !== passenger.id);
+        setOccupiedSeats(filteredSeats);
+      } catch (error) {
+        console.error('Gagal memuat kursi yang ditempati:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat informasi kursi",
+          variant: "destructive",
+        });
+      } finally {
+        setFetchingSeats(false);
+      }
+    };
     
+    fetchBusSeats();
+  }, [busId, passenger.id, toast]);
+  
+  const handleSeatSelect = (seatNumber: number) => {
+    setSelectedSeatNumber(seatNumber);
+  };
+  
+  const handleSubmit = async () => {
+    // Validate that a seat is selected if a bus is selected
+    if (busId !== 'none' && !selectedSeatNumber) {
+      toast({
+        title: "Peringatan",
+        description: "Pilih nomor kursi terlebih dahulu",
+        variant: "destructive",
+      });
+      setShowConfirmDialog(false);
+      return;
+    }
+    
+    setIsSubmitting(true);
     try {
       const { error } = await supabase
         .from('passengers')
@@ -94,7 +151,8 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
           address,
           destination,
           group_pondok: groupPondok,
-          bus_id: busId || null
+          bus_id: busId === 'none' ? null : busId,
+          bus_seat_number: busId === 'none' ? null : selectedSeatNumber
         })
         .eq('id', passenger.id);
       
@@ -162,7 +220,7 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="address">Alamat</Label>
+              <Label htmlFor="address">Alamat Lengkap</Label>
               <Textarea
                 id="address"
                 value={address}
@@ -173,19 +231,13 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="destination">Tujuan</Label>
-              <Select value={destination} onValueChange={setDestination}>
-                <SelectTrigger id="destination">
-                  <SelectValue placeholder="Pilih tujuan" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PREDEFINED_DESTINATIONS.map((dest) => (
-                    <SelectItem key={dest} value={dest}>
-                      {dest}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="destination">Kota Tujuan</Label>
+              <Input
+                id="destination"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                placeholder="Masukkan kota tujuan"
+              />
             </div>
             
             <div className="grid gap-2">
@@ -200,12 +252,21 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
             
             <div className="grid gap-2">
               <Label htmlFor="bus">Bus</Label>
-              <Select value={busId} onValueChange={setBusId}>
+              <Select 
+                value={busId} 
+                onValueChange={(value) => {
+                  setBusId(value);
+                  // Reset seat if bus changes
+                  if (value !== passenger.bus_id) {
+                    setSelectedSeatNumber(null);
+                  }
+                }}
+              >
                 <SelectTrigger id="bus">
                   <SelectValue placeholder="Pilih bus" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tidak ada bus</SelectItem>
+                  <SelectItem value="none">Tidak ada bus</SelectItem>
                   {buses.map((bus) => (
                     <SelectItem key={bus.id} value={bus.id}>
                       {bus.label}
@@ -214,17 +275,46 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
                 </SelectContent>
               </Select>
             </div>
+            
+            {busId && busId !== 'none' && (
+              <div className="space-y-2 border rounded-md p-3">
+                <Label className="mb-2 block">Pilih Kursi</Label>
+                {fetchingSeats ? (
+                  <div className="text-center py-4">Memuat kursi...</div>
+                ) : (
+                  <>
+                    <BusSeatSelector
+                      occupiedSeats={occupiedSeats}
+                      selectedSeat={selectedSeatNumber}
+                      onSeatSelect={handleSeatSelect}
+                      disabled={isSubmitting}
+                    />
+                    {selectedSeatNumber ? (
+                      <p className="text-sm text-center mt-2">
+                        Anda memilih kursi nomor: <strong>{selectedSeatNumber}</strong>
+                      </p>
+                    ) : (
+                      <p className="text-sm text-center mt-2 text-amber-600">
+                        Silakan pilih nomor kursi
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
           
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
               Batal
             </Button>
-            <AlertDialogTrigger asChild>
-              <Button type="submit" disabled={isSubmitting}>
-                Simpan Perubahan
-              </Button>
-            </AlertDialogTrigger>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || (busId !== 'none' && !selectedSeatNumber) || fetchingSeats}
+              onClick={() => setShowConfirmDialog(true)}
+            >
+              Simpan Perubahan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

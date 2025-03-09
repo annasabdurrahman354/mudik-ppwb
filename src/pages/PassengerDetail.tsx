@@ -219,7 +219,6 @@ const PassengerDetail = () => {
         />
       )}
       
-      <BottomNavigation />
     </div>
   );
 };

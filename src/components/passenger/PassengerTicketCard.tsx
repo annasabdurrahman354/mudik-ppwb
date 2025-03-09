@@ -66,7 +66,7 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
             </div>
 
             <div className="flex text-sm">
-              <p className="w-24 font-medium">Tujuan</p>
+              <p className="w-24 font-medium">Kota Tujuan</p>
               <p className="w-4">:</p>
               <p>{passenger.destination}</p>
             </div>
@@ -75,7 +75,7 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
 
           <div className="mt-8 grid grid-cols-2">
             <div>
-              <p className="font-medium underline text-sm">Alamat:</p>
+              <p className="font-medium underline text-sm">Alamat Lengkap:</p>
               <p className="text-sm">{passenger.address}</p>
             </div>
             <div className="text-center">

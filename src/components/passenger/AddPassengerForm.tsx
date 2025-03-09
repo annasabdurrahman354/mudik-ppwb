@@ -20,6 +20,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
   const [name, setName] = useState<string>('');
   const [gender, setGender] = useState<'L' | 'P'>('L');
   const [address, setAddress] = useState<string>('');
+  const [destination, setDestination] = useState<string>(''); // Added destination state
   const [groupPondok, setGroupPondok] = useState<string>('');
   const [busId, setBusId] = useState<string>('');
   const [occupiedSeats, setOccupiedSeats] = useState<any[]>([]);
@@ -92,18 +93,11 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     setIsLoading(true);
     
     try {
-      const selectedBus = buses.find(bus => bus.id === busId);
-      
-      if (!selectedBus) {
-        toast.error('Silakan pilih bus yang valid');
-        return;
-      }
-      
       await addPassenger({
         name,
         gender,
         address,
-        destination: selectedBus.destination,
+        destination, // Use the manually entered destination
         group_pondok: groupPondok,
         bus_seat_number: selectedSeatNumber,
         bus_id: busId,
@@ -126,6 +120,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     setName('');
     setGender('L');
     setAddress('');
+    setDestination(''); // Reset destination field
     setGroupPondok('');
     setBusId('');
     setSelectedSeatNumber(null);
@@ -170,7 +165,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
             </div>
           
           <div className="space-y-2">
-            <Label htmlFor="address">Alamat</Label>
+            <Label htmlFor="address">Alamat Lengkap</Label>
             <Textarea
               id="address"
               value={address}
@@ -183,6 +178,17 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="destination">Kota Tujuan</Label>
+              <Input
+                id="destination"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                placeholder="Masukkan kota tujuan"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="groupPondok">Kelompok Pondok</Label>
               <Input
                 id="groupPondok"
@@ -192,37 +198,37 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
                 required
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="bus">Pilih Bus</Label>
-              <Select value={busId} onValueChange={setBusId}>
-                <SelectTrigger id="bus">
-                  <SelectValue placeholder="Pilih bus" />
-                </SelectTrigger>
-                <SelectContent>
-                  {buses.map(bus => {
-                    const isAvailable = (busAvailability[bus.id] || 0) > 0;
-                    return (
-                      <SelectItem 
-                        key={bus.id} 
-                        value={bus.id}
-                        disabled={!isAvailable}
-                      >
-                        {`${bus.destination} #${bus.bus_number}`} 
-                        {isAvailable 
-                          ? ` (${busAvailability[bus.id]} kursi tersedia)` 
-                          : ' (PENUH)'}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-              {buses.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Tidak ada bus tersedia. Silakan tambahkan bus terlebih dahulu.
-                </p>
-              )}
-            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="bus">Pilih Bus</Label>
+            <Select value={busId} onValueChange={setBusId}>
+              <SelectTrigger id="bus">
+                <SelectValue placeholder="Pilih bus" />
+              </SelectTrigger>
+              <SelectContent>
+                {buses.map(bus => {
+                  const isAvailable = (busAvailability[bus.id] || 0) > 0;
+                  return (
+                    <SelectItem 
+                      key={bus.id} 
+                      value={bus.id}
+                      disabled={!isAvailable}
+                    >
+                      {`${bus.destination} #${bus.bus_number}`} 
+                      {isAvailable 
+                        ? ` (${busAvailability[bus.id]} kursi tersedia)` 
+                        : ' (PENUH)'}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {buses.length === 0 && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Tidak ada bus tersedia. Silakan tambahkan bus terlebih dahulu.
+              </p>
+            )}
           </div>
           
           {busId && (
