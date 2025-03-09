@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from 'react';
+import EditPassengerForm from '@/components/passenger/EditPassengerForm';
 
 const PassengerDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +29,7 @@ const PassengerDetail = () => {
   const { toast } = useToast();
   
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   
   const { data: passenger, isLoading, error } = useQuery({
     queryKey: ['passenger', id],
@@ -69,11 +71,7 @@ const PassengerDetail = () => {
   };
   
   const handleEdit = () => {
-    // For now, we'll just show a toast - editing functionality would require a new form
-    toast({
-      title: "Fitur dalam pengembangan",
-      description: "Fitur edit akan segera tersedia",
-    });
+    setIsEditFormOpen(true);
   };
   
   if (isLoading) {
@@ -212,6 +210,14 @@ const PassengerDetail = () => {
           </Button>
         </div>
       </motion.div>
+      
+      {passenger && (
+        <EditPassengerForm 
+          isOpen={isEditFormOpen} 
+          onClose={() => setIsEditFormOpen(false)}
+          passenger={passenger}
+        />
+      )}
       
       <BottomNavigation />
     </div>
