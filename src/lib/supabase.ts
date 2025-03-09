@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import ExcelJS from 'exceljs';
 
 // Replace with your Supabase URL and anon key
 const supabaseUrl = 'https://kcowmghdgmumnkaqngiz.supabase.co';
@@ -217,4 +218,71 @@ export function subscribeToUpdates(
       callback
     )
     .subscribe();
+}
+
+export async function generatePassengerExcel() {
+  const passengers = await fetchPassengers();
+  
+  // Group passengers by bus
+  const buses = {};
+  passengers.forEach(passenger => {
+    if (!passenger.bus) return;
+    const sheetName = `${passenger.bus.destination} ${passenger.bus.bus_number}`;
+    if (!buses[sheetName]) {
+      buses[sheetName] = [];
+    }
+    buses[sheetName].push(passenger);
+  });
+
+  const workbook = new ExcelJS.Workbook();
+  
+  Object.entries(buses).forEach(([sheetName, passengers]: [string, Passenger[]]) => {
+    const sheet = workbook.addWorksheet(sheetName);
+    
+    // Define headers
+    sheet.columns = [
+      { header: 'Nama', key: 'name', width: 20 },
+      { header: 'L/P', key: 'gender', width: 10 },
+      { header: 'Alamat', key: 'address', width: 30 },
+      { header: 'Destination', key: 'destination', width: 20 },
+      { header: 'Klp', key: 'group_pondok', width: 15 },
+      { header: 'Nomor', key: 'bus_seat_number', width: 10 },
+      { header: 'Pembayaran', key: 'total_payment', width: 15 },
+      { header: 'Tanggal Pemesanan', key: 'created_at', width: 20 }
+    ];
+    
+    // Sort passengers by gender first, then name
+    passengers.sort((a, b) => {
+      if (a.gender !== b.gender) {
+        return a.gender.localeCompare(b.gender);
+      }
+      return a.name.localeCompare(b.name);
+    });
+    
+    // Add data rows
+    passengers.forEach(passenger => {
+      sheet.addRow({
+        name: passenger.name,
+        gender: passenger.gender,
+        address: passenger.address,
+        destination: passenger.destination,
+        group_pondok: passenger.group_pondok,
+        bus_seat_number: passenger.bus_seat_number,
+        total_payment: passenger.total_payment,
+        created_at: new Date(passenger.created_at).toLocaleDateString()
+      });
+    });
+  });
+
+  // Write to buffer
+  const buffer = await workbook.xlsx.writeBuffer();
+  
+  // Create a Blob and trigger download
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Passenger_List.xlsx';
+  a.click();
+  URL.revokeObjectURL(url);
 }
