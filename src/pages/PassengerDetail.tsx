@@ -1,21 +1,80 @@
 
-import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { fetchPassengerById } from '@/lib/supabase';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchPassengerById, supabase } from '@/lib/supabase';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, TicketIcon, PrinterIcon } from 'lucide-react';
+import { ArrowLeft, TicketIcon, Trash2Icon, PencilIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from 'react';
 
 const PassengerDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const { data: passenger, isLoading, error } = useQuery({
     queryKey: ['passenger', id],
     queryFn: () => fetchPassengerById(id!),
     enabled: !!id
   });
+  
+  const handleDelete = async () => {
+    if (!id) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('passengers')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Berhasil!",
+        description: "Penumpang telah dihapus",
+      });
+      
+      // Invalidate queries and navigate back
+      queryClient.invalidateQueries({ queryKey: ['passengers'] });
+      navigate('/passengers');
+    } catch (error) {
+      console.error('Error deleting passenger:', error);
+      toast({
+        title: "Gagal!",
+        description: "Gagal menghapus penumpang",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  
+  const handleEdit = () => {
+    // For now, we'll just show a toast - editing functionality would require a new form
+    toast({
+      title: "Fitur dalam pengembangan",
+      description: "Fitur edit akan segera tersedia",
+    });
+  };
   
   if (isLoading) {
     return (
@@ -110,7 +169,41 @@ const PassengerDetail = () => {
           </CardContent>
         </Card>
         
-        <div className="flex justify-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleEdit}>
+              <PencilIcon className="mr-2 h-4 w-4" />
+              Edit Penumpang
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2Icon className="mr-2 h-4 w-4" />
+                  Hapus Penumpang
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Anda yakin ingin menghapus?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tindakan ini tidak dapat dibatalkan. Data penumpang akan dihapus secara permanen.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="bg-destructive text-destructive-foreground"
+                  >
+                    {isDeleting ? 'Menghapus...' : 'Hapus'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+          
           <Button asChild>
             <Link to={`/tickets/${passenger.id}`}>
               <TicketIcon className="mr-2 h-4 w-4" />
