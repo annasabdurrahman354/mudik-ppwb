@@ -31,11 +31,11 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
                   ) : (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">Perempuan</span>
                   )}
-                  <h3 className="font-medium">{passenger.name}</h3>
+                  <h3 className="font-medium">{passenger.name.ucwords()}</h3>
                 </div>
                 
                 <div className="mt-1 text-sm text-muted-foreground">
-                  <p>Kelompok: {passenger.group_pondok}</p>
+                  <p>Kelompok: {passenger.group_pondok.ucwords()}</p>
                 </div>
                 
                 {passenger.bus && (
@@ -45,6 +45,9 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
                     </span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                       Kursi #{passenger.bus_seat_number}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      Rp. {passenger.total_payment.toLocaleString("id-ID")}
                     </span>
                   </div>
                 )}

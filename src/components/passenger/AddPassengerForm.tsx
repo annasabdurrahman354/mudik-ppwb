@@ -20,8 +20,9 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
   const [name, setName] = useState<string>('');
   const [gender, setGender] = useState<'L' | 'P'>('L');
   const [address, setAddress] = useState<string>('');
-  const [destination, setDestination] = useState<string>(''); // Added destination state
+  const [destination, setDestination] = useState<string>('');
   const [groupPondok, setGroupPondok] = useState<string>('');
+  const [petugas, setPetugas] = useState<string>(''); // Added petugas state
   const [busId, setBusId] = useState<string>('');
   const [occupiedSeats, setOccupiedSeats] = useState<any[]>([]);
   const [selectedSeatNumber, setSelectedSeatNumber] = useState<number | null>(null);
@@ -29,6 +30,13 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
   const [fetchingSeats, setFetchingSeats] = useState<boolean>(false);
   const [buses, setBuses] = useState<any[]>([]);
   const [busAvailability, setBusAvailability] = useState<Record<string, number>>({});
+  
+  // List of petugas options
+  const petugasList = [
+    'Raja Faza', 'Yusuf Apri', 'Andri Falah', 'Raul', 'Abdul Wahab', 'Anas Titah Prayogi', 
+    'Rama Saputra Halim', 'Suhandoko', 'Jibril Aksan', 'Brilian Rizky', 'Abdurrahman', 'Johan Mahendra',
+    'Bima Syafaat', 'Diaz Pambudi'
+  ];
   
   const queryClient = useQueryClient();
   
@@ -90,6 +98,11 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
       return;
     }
     
+    if (!petugas) {
+      toast.error('Silakan pilih petugas');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -97,8 +110,9 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
         name,
         gender,
         address,
-        destination, // Use the manually entered destination
+        destination,
         group_pondok: groupPondok,
+        petugas, // Add petugas field to the request
         bus_seat_number: selectedSeatNumber,
         bus_id: busId,
       });
@@ -120,8 +134,9 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     setName('');
     setGender('L');
     setAddress('');
-    setDestination(''); // Reset destination field
+    setDestination('');
     setGroupPondok('');
+    setPetugas(''); // Reset petugas field
     setBusId('');
     setSelectedSeatNumber(null);
     setOccupiedSeats([]);
@@ -200,6 +215,23 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
             </div>
           </div>
           
+          {/* Added Petugas Select field */}
+          <div className="space-y-2">
+            <Label htmlFor="petugas">Petugas</Label>
+            <Select value={petugas} onValueChange={setPetugas} required>
+              <SelectTrigger id="petugas">
+                <SelectValue placeholder="Pilih petugas" />
+              </SelectTrigger>
+              <SelectContent>
+                {petugasList.map(name => (
+                  <SelectItem key={name} value={name}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="bus">Pilih Bus</Label>
             <Select value={busId} onValueChange={setBusId}>
@@ -260,7 +292,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
             </Button>
             <Button 
               type="submit" 
-              disabled={isLoading || buses.length === 0 || !selectedSeatNumber || fetchingSeats}
+              disabled={isLoading || buses.length === 0 || !selectedSeatNumber || fetchingSeats || !petugas}
             >
               {isLoading ? 'Menambahkan...' : 'Tambah Penumpang'}
             </Button>

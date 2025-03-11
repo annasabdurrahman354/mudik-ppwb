@@ -96,6 +96,12 @@ const PassengerDetail = () => {
       </div>
     );
   }
+
+  const createdAt = new Date(passenger.created_at).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long", // Full month name in Indonesian
+    year: "numeric",
+  });
   
   return (
     <div className="pb-20 px-8 pt-4 container w-full mx-auto">
@@ -117,7 +123,7 @@ const PassengerDetail = () => {
         <Card className="mb-6">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{passenger.name}</h2>
+              <h2 className="text-xl font-semibold">{passenger.name.ucwords()}</h2>
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                 passenger.gender === 'L' 
                   ? 'bg-blue-100 text-blue-700' 
@@ -140,7 +146,7 @@ const PassengerDetail = () => {
               
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Kelompok</span>
-                <span className="font-medium">{passenger.group_pondok}</span>
+                <span className="font-medium">{passenger.group_pondok.ucwords()}</span>
               </div>
               
               {passenger.bus && (
@@ -156,13 +162,19 @@ const PassengerDetail = () => {
                     <span className="text-muted-foreground">Nomor Penumpang</span>
                     <span className="font-medium">#{passenger.bus_seat_number}</span>
                   </div>
+
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Tanggal Pembelian</span>
+                    <span className="font-medium">{createdAt}</span>
+                  </div>
                   
                   <div className="flex justify-between pt-1">
                     <span className="text-muted-foreground">Total Pembayaran</span>
-                    <span className="font-semibold text-primary">Rp. {passenger.total_payment}</span>
+                    <span className="font-semibold text-primary">Rp. {passenger.total_payment.toLocaleString("id-ID")}</span>
                   </div>
                 </>
               )}
+             
             </div>
           </CardContent>
         </Card>

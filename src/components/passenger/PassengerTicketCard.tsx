@@ -5,14 +5,11 @@ interface PassengerTicketCardProps {
 }
 
 export default function PassengerTicketCard({ passenger}: PassengerTicketCardProps) {
-  const currentDate = new Date().toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "2-digit",
+  const createdAt = new Date(passenger.created_at).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long", // Full month name in Indonesian
     year: "numeric",
-  })
-
-  // Calculate age based on created_at date
-  const today = new Date()
+  });
 
   return (
     <div id="print" className="w-full mx-auto bg-white shadow-md rounded-md overflow-hidden print:shadow-none">
@@ -79,7 +76,7 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
               <p className="text-sm">{passenger.address}</p>
             </div>
             <div className="text-center">
-              <p className="font-medium text-sm">Kediri, {currentDate}</p>
+              <p className="font-medium text-sm">Kediri, {createdAt}</p>
               <p className="text-sm">Petugas,</p>
               <div className="h-10"></div>
               <p>( ________________________ )</p>

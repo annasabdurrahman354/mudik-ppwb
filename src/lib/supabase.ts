@@ -27,6 +27,7 @@ export type Passenger = {
   group_pondok: string;
   bus_seat_number: number;
   total_payment: number;
+  petugas: string;
   bus_id: string | null;
   created_at: string;
   // For UI only, not in database

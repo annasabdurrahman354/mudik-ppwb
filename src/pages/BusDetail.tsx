@@ -115,7 +115,7 @@ const BusDetail = () => {
               
               <div className="flex justify-between pt-1">
                 <span className="text-muted-foreground">Tarif Per Penumpang</span>
-                <span className="font-semibold text-primary">Rp. {bus.fare_per_passenger}</span>
+                <span className="font-semibold text-primary">Rp. {bus.fare_per_passenger.toLocaleString("id-ID")}</span>
               </div>
             </div>
             

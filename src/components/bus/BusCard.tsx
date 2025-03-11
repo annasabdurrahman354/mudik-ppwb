@@ -57,7 +57,7 @@ const BusCard = ({ bus, passengersCount, className }: BusCardProps) => {
               </div>
               <div className="flex items-center justify-between mt-1">
                 <span>Tarif:</span>
-                <span>Rp. {bus.fare_per_passenger}</span>
+                <span>Rp. {bus.fare_per_passenger.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex items-center justify-between mt-1">
                 <span>Jumlah Penumpang:</span>
