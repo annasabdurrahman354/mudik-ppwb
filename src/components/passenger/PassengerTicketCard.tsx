@@ -77,7 +77,7 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
             </div>
             <div className="text-center">
               <p className="font-medium text-sm">Kediri, {createdAt}</p>
-              <p className="text-sm">Petugas,</p>
+              <p className="text-sm">{passenger.petugas},</p>
               <div className="h-10"></div>
               <p>( ________________________ )</p>
             </div>
