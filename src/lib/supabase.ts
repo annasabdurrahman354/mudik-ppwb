@@ -14,6 +14,8 @@ export type Bus = {
   destination: string;
   bus_number: number;
   max_passengers: number;
+  meal_count: number;
+  meal_price: number;
   fare_per_passenger: number;
   created_at: string;
 };
@@ -23,9 +25,13 @@ export type Passenger = {
   name: string;
   gender: 'L' | 'P';
   address: string;
+  phone: string;
   destination: string;
+  status: string;
   group_pondok: string;
   bus_seat_number: number;
+  meal_count: number;
+  meal_payment: number;
   total_payment: number;
   petugas: string;
   bus_id: string | null;
@@ -37,6 +43,10 @@ export type Passenger = {
 // Destinations
 export const PREDEFINED_DESTINATIONS = [
   'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Solo', 'Malang', 'Semarang', 'Bali'
+];
+
+export const PREDEFINED_PASSENGER_STATUS = [
+  'pondok', 'umum'
 ];
 
 // Helper functions
@@ -129,12 +139,27 @@ export async function addBus(bus: Omit<Bus, 'id' | 'created_at' | 'bus_number'>)
   return data[0] as Bus;
 }
 
+export async function updatePassenger(id: string, updatedFields: Partial<Passenger>) {
+  const { data, error } = await supabase
+    .from('passengers')
+    .update(updatedFields)
+    .eq('id', id)
+    .select();
+  
+  if (error) {
+    console.error('Error updating passenger:', error);
+    throw error;
+  }
+  
+  return data[0] as Passenger;
+}
+
 export async function addPassenger(passenger: Omit<Passenger, 'id' | 'created_at' | 'total_payment'> & { bus_id: string }) {
   // Get the selected bus details
   const bus = await fetchBusById(passenger.bus_id);
   
   // Calculate total payment based on bus fare
-  const totalPayment = bus.fare_per_passenger;
+  const totalPayment = bus.fare_per_passenger + (passenger.meal_count * bus.meal_price);
   
   const { data, error } = await supabase
     .from('passengers')

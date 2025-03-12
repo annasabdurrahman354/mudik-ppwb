@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,8 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
   const [customDestination, setCustomDestination] = useState<string>('');
   const [maxPassengers, setMaxPassengers] = useState<number>(50);
   const [farePerPassenger, setFarePerPassenger] = useState<number>(100000);
+  const [mealCount, setMealCount] = useState<number>(0);
+  const [mealPrice, setMealPrice] = useState<number>(20000);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   const queryClient = useQueryClient();
@@ -38,7 +39,9 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
       await addBus({
         destination: finalDestination,
         max_passengers: maxPassengers,
-        fare_per_passenger: farePerPassenger
+        fare_per_passenger: farePerPassenger,
+        meal_count: mealCount,
+        meal_price: mealPrice
       });
       
       toast.success('Bus added successfully');
@@ -58,6 +61,8 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
     setCustomDestination('');
     setMaxPassengers(50);
     setFarePerPassenger(100000);
+    setMealCount(0);
+    setMealPrice(20000);
   };
   
   return (
@@ -118,6 +123,30 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
               min="1"
               value={farePerPassenger}
               onChange={(e) => setFarePerPassenger(parseInt(e.target.value))}
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="mealCount">Jumlah Makanan</Label>
+            <Input
+              id="mealCount"
+              type="number"
+              min="0"
+              value={mealCount}
+              onChange={(e) => setMealCount(parseInt(e.target.value))}
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="mealPrice">Harga Makanan (Rp)</Label>
+            <Input
+              id="mealPrice"
+              type="number"
+              min="0"
+              value={mealPrice}
+              onChange={(e) => setMealPrice(parseInt(e.target.value))}
               required
             />
           </div>

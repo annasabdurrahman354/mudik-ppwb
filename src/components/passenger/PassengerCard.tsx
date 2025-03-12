@@ -35,6 +35,7 @@ const PassengerCard = ({ passenger, className }: PassengerCardProps) => {
                 </div>
                 
                 <div className="mt-1 text-sm text-muted-foreground">
+                  <p>Status: {passenger.status.ucwords()}</p>
                   <p>Kelompok: {passenger.group_pondok.ucwords()}</p>
                 </div>
                 

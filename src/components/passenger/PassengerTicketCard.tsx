@@ -32,6 +32,45 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
           <div className="border-t border-b border-gray-300 mt-3"></div>
 
           <div className="grid grid-cols-2 mt-2">
+            <div className="flex text-sm">
+              <p className="w-20 font-medium">Nama</p>
+              <p className="w-4">:</p>
+              <p>{passenger.name}</p>
+            </div>
+
+            <div className="flex text-sm">
+              <p className="w-24 font-medium">Jenis Kelamin</p>
+              <p className="w-4">:</p>
+              <p>{passenger.gender === "L" ? "Laki-laki" : "Perempuan"}</p>
+            </div>
+
+            <div className="flex text-sm">
+              <p className="w-20 font-medium">Status</p>
+              <p className="w-4">:</p>
+              <p>{passenger.status.ucwords()}</p>
+            </div>
+
+            <div className="flex text-sm">
+              <p className="w-24 font-medium">Kelompok</p>
+              <p className="w-4">:</p>
+              <p>{passenger.group_pondok}</p>
+            </div>
+
+            {passenger.phone && 
+            <div className="flex text-sm">
+              <p className="w-20 font-medium">Telepon</p>
+              <p className="w-4">:</p>
+              <p>{passenger.phone}</p>
+            </div>
+            }
+
+            {passenger.status === "umum" &&
+            <div className="flex text-sm">
+              <p className="w-24 font-medium">Kota Tujuan</p>
+              <p className="w-4">:</p>
+              <p>{passenger.destination}</p>
+            </div>
+            }
 
             <div className="flex text-sm">
               <p className="w-20 font-medium">Bus</p>
@@ -44,30 +83,14 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
               <p className="w-4">:</p>
               <p>{passenger.bus_seat_number}</p>
             </div>
-
+            
+            {passenger.status === "pondok" &&
             <div className="flex text-sm">
-              <p className="w-20 font-medium">Nama</p>
-              <p className="w-4">:</p>
-              <p>{passenger.name}</p>
-            </div>
-            <div className="flex text-sm">
-              <p className="w-24 font-medium">Jenis Kelamin</p>
-              <p className="w-4">:</p>
-              <p>{passenger.gender === "L" ? "Laki-laki" : "Perempuan"}</p>
-            </div>
-
-            <div className="flex text-sm">
-              <p className="w-20 font-medium">Kelompok</p>
-              <p className="w-4">:</p>
-              <p>{passenger.group_pondok}</p>
-            </div>
-
-            <div className="flex text-sm">
-              <p className="w-24 font-medium">Kota Tujuan</p>
+              <p className="w-20 font-medium">Kota Tujuan</p>
               <p className="w-4">:</p>
               <p>{passenger.destination}</p>
             </div>
-            
+            }
           </div>
 
           <div className="mt-8 grid grid-cols-2">
@@ -90,10 +113,19 @@ export default function PassengerTicketCard({ passenger}: PassengerTicketCardPro
             <h2 className="font-semibold text-center">DETAIL PEMBAYARAN</h2>
           </div>
 
-          <div className="flex mb-2">
-            <p className="w-24 font-medium text-sm">Keperluan</p>
-            <p className="w-4">:</p>
-            <p className="text-sm">Tiket Bus</p>
+          <div className="mb-2">
+            <p className="w-24 font-medium text-sm">Keperluan: </p>
+            <div className="flex mb-1 justify-between">
+              <p className="text-sm">Bus</p>
+              <p className="text-sm text-right">Rp. {passenger.bus?.fare_per_passenger.toLocaleString("id-ID")}</p>  
+            </div>
+            
+            {passenger.meal_payment > 0 && 
+              <div className="flex mb-1 justify-between">
+                <p className="text-sm">Makan</p>
+                <p className="text-sm text-right">Rp. {passenger.meal_payment.toLocaleString("id-ID")}</p>  
+              </div>
+            }
           </div>
 
           <div className="border-t border-gray-300 my-4"></div>

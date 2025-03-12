@@ -134,6 +134,13 @@ const PassengerDetail = () => {
             </div>
             
             <div className="space-y-3 text-sm">
+              {passenger.phone  && 
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-muted-foreground">Telepon</span>
+                  <span className="font-medium">{passenger.phone}</span>
+                </div>
+              }
+
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Alamat</span>
                 <span className="font-medium text-right">{passenger.address}</span>
@@ -142,6 +149,11 @@ const PassengerDetail = () => {
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Tujuan</span>
                 <span className="font-medium">{passenger.destination}</span>
+              </div>
+
+              <div className="flex justify-between pt-1">
+                <span className="text-muted-foreground">Status</span>
+                <span className="font-medium">{passenger.status === "pondok" ? "Pondok" : "Umum"}</span>
               </div>
               
               <div className="flex justify-between border-b pb-2">
@@ -167,6 +179,19 @@ const PassengerDetail = () => {
                     <span className="text-muted-foreground">Tanggal Pembelian</span>
                     <span className="font-medium">{createdAt}</span>
                   </div>
+
+                  {passenger.meal_count > 0 &&  passenger.meal_payment > 0 &&
+                  <>
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Makan</span>
+                      <span className="font-medium">{passenger.meal_count}x</span>
+                    </div>
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Total Uang Makan</span>
+                      <span className="font-semibold text-primary">Rp. {passenger.meal_payment.toLocaleString("id-ID")}</span>
+                    </div>
+                  </>
+                  }
                   
                   <div className="flex justify-between pt-1">
                     <span className="text-muted-foreground">Total Pembayaran</span>
