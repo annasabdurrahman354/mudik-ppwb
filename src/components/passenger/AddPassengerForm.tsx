@@ -516,7 +516,6 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
                 !petugas || 
                 (status === 'umum' && !phone) ||
                 (status === 'umum' && (!daerahPondok || !kelompok)) ||
-                (status === 'umum' && mealCount === 0) ||
                 isLoading
               }
             >

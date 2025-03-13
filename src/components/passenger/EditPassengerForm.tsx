@@ -568,8 +568,7 @@ const EditPassengerForm = ({ isOpen, onClose, passenger }: EditPassengerFormProp
                 fetchingSeats || 
                 !petugas || 
                 (status === 'umum' && !phone) ||
-                (status === 'umum' && (!daerahPondok || !kelompok)) ||
-                (status === 'umum' && mealCount === 0)
+                (status === 'umum' && (!daerahPondok || !kelompok))
               }
               onClick={() => setShowConfirmDialog(true)}
             >
