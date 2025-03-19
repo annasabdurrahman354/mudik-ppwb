@@ -272,7 +272,9 @@ export async function generatePassengerExcel() {
       { header: 'Alamat', key: 'address', width: 30 },
       { header: 'Destination', key: 'destination', width: 20 },
       { header: 'Klp', key: 'group_pondok', width: 15 },
+      { header: 'Dapur', key: 'dapur', width: 15 },
       { header: 'Nomor', key: 'bus_seat_number', width: 10 },
+      { header: 'Telepon', key: 'phone', width: 10 },
       { header: 'Pembayaran', key: 'total_payment', width: 15 },
       { header: 'Tanggal Pemesanan', key: 'created_at', width: 20 }
     ];
@@ -287,13 +289,18 @@ export async function generatePassengerExcel() {
     
     // Add data rows
     passengers.forEach(passenger => {
+      const dapurKeywords = ['Guru', 'Pembina', 'Wustha', 'Ulya', 'Kelas', 'Firma', 'listrik', 'UKP', 'UB', "GP", "GB", "CBR", "Database"];
+      const dapur = dapurKeywords.some(keyword => passenger.group_pondok.toLowerCase().includes(keyword.toLowerCase())) ? 'Firma' : 'Mbahman';
+      
       sheet.addRow({
         name: passenger.name,
         gender: passenger.gender,
         address: passenger.address,
         destination: passenger.destination,
         group_pondok: passenger.group_pondok,
+        dapur: dapur,
         bus_seat_number: passenger.bus_seat_number,
+        phone: passenger.phone,
         total_payment: passenger.total_payment,
         created_at: new Date(passenger.created_at).toLocaleDateString()
       });
@@ -308,7 +315,7 @@ export async function generatePassengerExcel() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'Passenger_List.xlsx';
+  a.download = 'Export Penumpang.xlsx';
   a.click();
   URL.revokeObjectURL(url);
 }
