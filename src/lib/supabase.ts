@@ -248,7 +248,7 @@ export function subscribeToUpdates(
 
 export async function generatePassengerExcel() {
   const passengers = await fetchPassengers();
-  
+
   // Group passengers by bus
   const buses = {};
   passengers.forEach(passenger => {
@@ -268,18 +268,22 @@ export async function generatePassengerExcel() {
 
   overviewSheet.columns = [
     { header: 'Bus', key: 'bus_name', width: 30 },
-    { header: 'Total Passengers', key: 'passenger_count', width: 20 },
-    { header: 'Total Meal Count', key: 'meal_count', width: 20 },
-    { header: 'Total Meal Payment', key: 'meal_payment', width: 20 },
-    { header: 'Total Fare', key: 'fare_per_passenger', width: 20 },
-    { header: 'Total Payment', key: 'total_payment', width: 20 }
+    { header: 'Total Penumpang', key: 'passenger_count', width: 20 },
+    { header: 'Total Umum', key: 'total_umum', width: 20 },
+    { header: 'Total Pondok', key: 'total_pondok', width: 20 },
+    { header: 'Total Jumlah Makan Pondok', key: 'total_makan_pondok', width: 20 },
+    { header: 'Total Jumlah Makan Umum', key: 'meal_count', width: 20 },
+    { header: 'Total Pembayaran Uang Makan Umum', key: 'meal_payment', width: 20 },
+    { header: 'Total Tiket (Umum + Pondok)', key: 'fare_per_passenger', width: 20 },
+    { header: 'Total Pembayaran (Umum + Pondok)', key: 'total_payment', width: 20 },
+    { header: 'Total Firma', key: 'total_firma', width: 20 },
+    { header: 'Total Mbahman', key: 'total_mbahman', width: 20 },
   ];
 
   sortedBusKeys.forEach(sheetName => {
     const passengers = buses[sheetName];
     const sheet = workbook.addWorksheet(sheetName);
-    
-    // Define headers
+
     sheet.columns = [
       { header: 'Nomor', key: 'bus_seat_number', width: 10 },
       { header: 'Nama', key: 'name', width: 20 },
@@ -296,16 +300,15 @@ export async function generatePassengerExcel() {
       { header: 'Tanggal Pemesanan', key: 'created_at', width: 20 }
     ];
 
-    // Sort passengers first by bus_seat_number
     passengers.sort((a, b) => (a.bus_seat_number || 0) - (b.bus_seat_number || 0));
 
     let totalMealCount = 0, totalMealPayment = 0, totalFare = 0, totalPayment = 0;
+    let totalUmum = 0, totalPondok = 0, totalFirma = 0, totalMbahman = 0;
     
-    // Add data rows
     passengers.forEach(passenger => {
       const dapurKeywords = ['Guru', 'Pembina', 'Wustha', 'Ulya', 'Kelas', 'Firma', 'listrik', 'UKP', 'UB', "GP", "GB", "CBR", "Database", "Wustho", "Ketua", "Putri"];
       const dapur = dapurKeywords.some(keyword => passenger.group_pondok.toLowerCase().includes(keyword.toLowerCase())) ? 'Firma' : 'Mbahman';
-      
+
       sheet.addRow({
         bus_seat_number: passenger.bus_seat_number,
         name: passenger.name,
@@ -326,9 +329,30 @@ export async function generatePassengerExcel() {
       totalMealPayment += passenger.meal_payment || 0;
       totalFare += passenger.bus.fare_per_passenger || 0;
       totalPayment += passenger.total_payment || 0;
+
+      if (passenger.group_pondok.startsWith('U-')) {
+        totalUmum++;
+      } else {
+        totalPondok++;
+      }
+
+      if (dapur === 'Firma') {
+        totalFirma++;
+      } else {
+        totalMbahman++;
+      }
     });
-    
-    // Add total row
+
+    // Determine "Total Makan Pondok"
+    let totalMakanPondok = 0;
+    const destination = passengers[0]?.bus?.destination?.toLowerCase();
+    if (['bandung', 'jakarta', 'cilacap', 'banyuwangi'].includes(destination)) {
+      totalMakanPondok = totalPondok * 1;
+    } else if (['lampung', 'palembang'].includes(destination)) {
+      totalMakanPondok = totalPondok * 2;
+    }
+
+    // Add total row in each bus sheet
     sheet.addRow({
       name: 'Total',
       meal_count: totalMealCount,
@@ -341,16 +365,21 @@ export async function generatePassengerExcel() {
     overviewSheet.addRow({
       bus_name: sheetName,
       passenger_count: passengers.length,
+      total_umum: totalUmum,
+      total_pondok: totalPondok,
+      total_makan_pondok: totalMakanPondok,
       meal_count: totalMealCount,
       meal_payment: totalMealPayment,
       fare_per_passenger: totalFare,
-      total_payment: totalPayment
+      total_payment: totalPayment,
+      total_firma: totalFirma,
+      total_mbahman: totalMbahman,
     });
   });
 
   // Write to buffer
   const buffer = await workbook.xlsx.writeBuffer();
-  
+
   // Create a Blob and trigger download
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(blob);
@@ -360,4 +389,3 @@ export async function generatePassengerExcel() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
