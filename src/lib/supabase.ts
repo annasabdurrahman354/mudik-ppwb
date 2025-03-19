@@ -289,7 +289,7 @@ export async function generatePassengerExcel() {
     
     // Add data rows
     passengers.forEach(passenger => {
-      const dapurKeywords = ['Guru', 'Pembina', 'Wustha', 'Ulya', 'Kelas', 'Firma', 'listrik', 'UKP', 'UB', "GP", "GB", "CBR", "Database"];
+      const dapurKeywords = ['Guru', 'Pembina', 'Wustha', 'Ulya', 'Kelas', 'Firma', 'listrik', 'UKP', 'UB', "GP", "GB", "CBR", "Database", "Wustho", "Ketua", "Putri"];
       const dapur = dapurKeywords.some(keyword => passenger.group_pondok.toLowerCase().includes(keyword.toLowerCase())) ? 'Firma' : 'Mbahman';
       
       sheet.addRow({
