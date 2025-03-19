@@ -260,33 +260,33 @@ export async function generatePassengerExcel() {
     buses[sheetName].push(passenger);
   });
 
+  // Sort sheet names alphabetically
+  const sortedBusKeys = Object.keys(buses).sort();
+
   const workbook = new ExcelJS.Workbook();
-  
-  Object.entries(buses).forEach(([sheetName, passengers]: [string, Passenger[]]) => {
+
+  sortedBusKeys.forEach(sheetName => {
+    const passengers = buses[sheetName];
+
     const sheet = workbook.addWorksheet(sheetName);
     
     // Define headers
     sheet.columns = [
+      { header: 'Nomor', key: 'bus_seat_number', width: 10 },
       { header: 'Nama', key: 'name', width: 20 },
       { header: 'L/P', key: 'gender', width: 10 },
+      { header: 'Telepon', key: 'phone', width: 10 },
       { header: 'Alamat', key: 'address', width: 30 },
       { header: 'Destination', key: 'destination', width: 20 },
       { header: 'Klp', key: 'group_pondok', width: 15 },
       { header: 'Dapur', key: 'dapur', width: 15 },
-      { header: 'Nomor', key: 'bus_seat_number', width: 10 },
-      { header: 'Telepon', key: 'phone', width: 10 },
       { header: 'Pembayaran', key: 'total_payment', width: 15 },
       { header: 'Tanggal Pemesanan', key: 'created_at', width: 20 }
     ];
-    
-    // Sort passengers by gender first, then name
-    passengers.sort((a, b) => {
-      if (a.gender !== b.gender) {
-        return a.gender.localeCompare(b.gender);
-      }
-      return a.name.localeCompare(b.name);
-    });
-    
+
+    // Sort passengers first by bus_seat_number
+    passengers.sort((a: Passenger, b: Passenger) => (a.bus_seat_number || 0) - (b.bus_seat_number || 0));
+
     // Add data rows
     passengers.forEach(passenger => {
       const dapurKeywords = ['Guru', 'Pembina', 'Wustha', 'Ulya', 'Kelas', 'Firma', 'listrik', 'UKP', 'UB', "GP", "GB", "CBR", "Database", "Wustho", "Ketua", "Putri"];
