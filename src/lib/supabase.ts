@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import ExcelJS from 'exceljs';
 
 // Replace with your Supabase URL and anon key
-const supabaseUrl = 'https://kcowmghdgmumnkaqngiz.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtjb3dtZ2hkZ211bW5rYXFuZ2l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzOTU0ODIsImV4cCI6MjA1Njk3MTQ4Mn0.kD50v_oFQMd_wtVPBd-vUpWLQUe_12hCnSXnyF-dxCI';
+const supabaseUrl = 'https://kgxzzkudplrcffvqgxnq.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtneHp6a3VkcGxyY2ZmdnFneG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MDU0MjYsImV4cCI6MjA4NjQ4MTQyNn0.5Y5sbK2bydpyUoBpcmxjO4xDQYF4skC4U2PCRJUElbs';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -209,6 +209,24 @@ export async function getOccupiedSeats(busId: string) {
   }
   
   return data as { id: string; gender: 'L' | 'P'; bus_seat_number: number }[];
+}
+
+export async function checkSeatAvailability(busId: string, seatNumber: number) {
+  const { data, error } = await supabase
+    .from('passengers')
+    .select('id')
+    .eq('bus_id', busId)
+    .eq('bus_seat_number', seatNumber)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "The result contains 0 rows"
+    console.error('Error checking seat availability:', error);
+    throw error;
+  }
+  
+  // If data exists, the seat is occupied (return false)
+  // If data is null (error PGRST116), the seat is available (return true)
+  return !data;
 }
 
 export async function fetchPassengerCounts() {

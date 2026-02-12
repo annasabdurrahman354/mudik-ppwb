@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { fetchBuses, addPassenger, getAvailableSeatsCount, getOccupiedSeats, PREDEFINED_PASSENGER_STATUS } from '@/lib/supabase';
+import { fetchBuses, addPassenger, getAvailableSeatsCount, getOccupiedSeats, checkSeatAvailability, PREDEFINED_PASSENGER_STATUS } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import BusSeatSelector from './BusSeatSelector';
@@ -185,6 +185,30 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     
     setIsLoading(true);
     
+    // Check seat availability one last time before submitting
+    try {
+      if (selectedSeatNumber) {
+        const isAvailable = await checkSeatAvailability(busId, selectedSeatNumber);
+        if (!isAvailable) {
+          toast.error(`Kursi nomor ${selectedSeatNumber} sudah tidak tersedia. Mohon pilih kursi lain.`);
+          
+          // Refresh occupied seats to show the latest state
+          const seats = await getOccupiedSeats(busId);
+          setOccupiedSeats(seats);
+          
+          // Deselect the seat
+          setSelectedSeatNumber(null);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking seat availability:', error);
+      toast.error('Gagal memeriksa ketersediaan kursi. Silakan coba lagi.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await addPassenger({
         name,
