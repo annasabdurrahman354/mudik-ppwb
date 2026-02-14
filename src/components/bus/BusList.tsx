@@ -5,14 +5,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
-const BusList = () => {
+interface BusListProps {
+  activePeriodId?: string;
+}
+
+const BusList = ({ activePeriodId }: BusListProps) => {
   const [selectedDestination, setSelectedDestination] = useState<string>('semua');
   const [busPassengerCounts, setBusPassengerCounts] = useState<Record<string, number>>({});
   
   // Ambil data bus
   const { data: buses = [], isLoading, refetch } = useQuery({
-    queryKey: ['buses'],
-    queryFn: fetchBuses
+    queryKey: ['buses', activePeriodId],
+    queryFn: () => fetchBuses(activePeriodId),
+    enabled: !!activePeriodId
   });
   
   // Dapatkan destinasi unik
@@ -28,7 +33,7 @@ const BusList = () => {
     if (buses.length > 0) {
       const loadPassengerCounts = async () => {
         try {
-          const counts = await fetchPassengerCounts();
+          const counts = await fetchPassengerCounts(activePeriodId);
           setBusPassengerCounts(counts);
         } catch (error) {
           console.error('Error mengambil jumlah penumpang:', error);

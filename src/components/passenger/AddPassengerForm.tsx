@@ -14,9 +14,10 @@ import BusSeatSelector from './BusSeatSelector';
 interface AddPassengerFormProps {
   isOpen: boolean;
   onClose: () => void;
+  periodId: string;
 }
 
-const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
+const AddPassengerForm = ({ isOpen, onClose, periodId }: AddPassengerFormProps) => {
   const [name, setName] = useState<string>('');
   const [gender, setGender] = useState<'L' | 'P'>('L');
   const [address, setAddress] = useState<string>('');
@@ -53,7 +54,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
   useEffect(() => {
     const loadBuses = async () => {
       try {
-        const busesData = await fetchBuses();
+        const busesData = await fetchBuses(periodId);
         setBuses(busesData);
         
         // Check availability for each bus
@@ -70,10 +71,10 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
       }
     };
     
-    if (isOpen) {
+    if (isOpen && periodId) {
       loadBuses();
     }
-  }, [isOpen]);
+  }, [isOpen, periodId]);
 
   // Fetch occupied seats when bus is selected
   useEffect(() => {
@@ -223,6 +224,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
         meal_count: mealCount,
         meal_payment: mealPayment,
         bus_id: busId,
+        period_id: periodId,
       });
       
       toast.success('Penumpang berhasil ditambahkan');

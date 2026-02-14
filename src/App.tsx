@@ -10,6 +10,7 @@ import BusDetail from "./pages/BusDetail";
 import Passengers from "./pages/Passengers";
 import PassengerDetail from "./pages/PassengerDetail";
 import TicketPrint from "./pages/TicketPrint";
+import Periods from "./pages/Periods";
 import NotFound from "./pages/NotFound";
 
 // Add framer-motion for animations
@@ -33,6 +34,7 @@ const App = () => (
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/periods" element={<Periods />} />
             <Route path="/buses" element={<Buses />} />
             <Route path="/buses/:id" element={<BusDetail />} />
             <Route path="/passengers" element={<Passengers />} />

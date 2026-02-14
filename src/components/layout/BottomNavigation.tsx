@@ -1,5 +1,5 @@
 
-import { Bus, Users } from 'lucide-react';
+import { Bus, Users, Clock } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -13,6 +13,23 @@ const BottomNavigation = () => {
     <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4">
       <div className="glass shadow-xl border border-gray-100 rounded-2xl mx-auto">
         <nav className="flex justify-evenly px-2 my-2">
+          <Link 
+            to="/periods" 
+            className={cn(
+              "bottom-nav-item relative no-tap-highlight",
+              path.startsWith('/periods') ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            {path.startsWith('/periods') && (
+              <motion.span 
+                layoutId="nav-indicator"
+                className="absolute inset-0 bg-primary/10 rounded-full"
+                initial={false}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+            )}
+            <Clock size={24} className='m-1'/>
+          </Link>
           <Link 
             to="/buses" 
             className={cn(
