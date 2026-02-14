@@ -3,12 +3,26 @@ import { createClient } from '@supabase/supabase-js';
 import ExcelJS from 'exceljs';
 
 // Replace with your Supabase URL and anon key
-const supabaseUrl = 'https://kcowmghdgmumnkaqngiz.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtjb3dtZ2hkZ211bW5rYXFuZ2l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzOTU0ODIsImV4cCI6MjA1Njk3MTQ4Mn0.kD50v_oFQMd_wtVPBd-vUpWLQUe_12hCnSXnyF-dxCI';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Types for our application
+export type PeriodStatus = 'DRAFT' | 'ACTIVE' | 'LOCKED' | 'ARCHIVED';
+
+export type Period = {
+  id: string;
+  name: string;
+  type?: string;
+  start_date?: string;
+  end_date?: string;
+  status: PeriodStatus;
+  default_fare?: number;
+  notes?: string;
+  created_at: string;
+};
+
 export type Bus = {
   id: string;
   destination: string;
@@ -17,6 +31,7 @@ export type Bus = {
   meal_count: number;
   meal_price: number;
   fare_per_passenger: number;
+  period_id: string;
   created_at: string;
 };
 
@@ -35,6 +50,7 @@ export type Passenger = {
   total_payment: number;
   petugas: string;
   bus_id: string | null;
+  period_id: string;
   created_at: string;
   // For UI only, not in database
   bus?: Bus;
@@ -45,17 +61,147 @@ export const PREDEFINED_DESTINATIONS = [
   'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Solo', 'Malang', 'Semarang', 'Bali'
 ];
 
+// Period Service
+export async function fetchPeriods(status?: PeriodStatus) {
+  let query = supabase
+    .from('periods')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (status) {
+    query = query.eq('status', status);
+  }
+  
+  const { data, error } = await query;
+  
+  if (error) {
+    console.error('Error fetching periods:', error);
+    throw error;
+  }
+  
+  return data as Period[];
+}
+
+export async function getActivePeriod() {
+  const { data, error } = await supabase
+    .from('periods')
+    .select('*')
+    .eq('status', 'ACTIVE')
+    .single();
+  
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching active period:', error);
+    throw error;
+  }
+  
+  return data as Period | null;
+}
+
+export async function createPeriod(period: Omit<Period, 'id' | 'created_at' | 'status'>) {
+  const { data, error } = await supabase
+    .from('periods')
+    .insert([{ ...period, status: 'DRAFT' }])
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error creating period:', error);
+    throw error;
+  }
+  
+  return data as Period;
+}
+
+export async function updatePeriod(id: string, updates: Partial<Period>) {
+  const { data, error } = await supabase
+    .from('periods')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error updating period:', error);
+    throw error;
+  }
+  
+  return data as Period;
+}
+
+export async function activatePeriod(id: string) {
+  // RPC call would be better for atomicity, but for now we'll do client-side logic
+  // 1. Lock current active period
+  const activePeriod = await getActivePeriod();
+  if (activePeriod) {
+    await updatePeriod(activePeriod.id, { status: 'LOCKED' });
+  }
+  
+  // 2. Activate new period
+  return await updatePeriod(id, { status: 'ACTIVE' });
+}
+
+export async function lockPeriod(id: string) {
+  return await updatePeriod(id, { status: 'LOCKED' });
+}
+
+export async function archivePeriod(id: string) {
+  return await updatePeriod(id, { status: 'ARCHIVED' });
+}
+
+export async function deletePeriod(id: string) {
+  // 1. Delete all passengers associated with this period
+  const { error: passengerError } = await supabase
+    .from('passengers')
+    .delete()
+    .eq('period_id', id);
+
+  if (passengerError) {
+    console.error('Error deleting related passengers:', passengerError);
+    throw passengerError;
+  }
+
+  // 2. Delete all buses associated with this period
+  const { error: busError } = await supabase
+    .from('buses')
+    .delete()
+    .eq('period_id', id);
+
+  if (busError) {
+    console.error('Error deleting related buses:', busError);
+    throw busError;
+  }
+
+  // 3. Delete the period itself
+  const { error } = await supabase
+    .from('periods')
+    .delete()
+    .eq('id', id);
+  
+  if (error) {
+    console.error('Error deleting period:', error);
+    throw error;
+  }
+  
+  return true;
+}
+
 export const PREDEFINED_PASSENGER_STATUS = [
   'pondok', 'umum'
 ];
 
 // Helper functions
-export async function fetchBuses() {
-  const { data, error } = await supabase
+export async function fetchBuses(periodId?: string) {
+  let query = supabase
     .from('buses')
     .select('*')
     .order('destination', { ascending: true })
     .order('bus_number', { ascending: true });
+  
+  if (periodId) {
+    query = query.eq('period_id', periodId);
+  }
+  
+  const { data, error } = await query;
   
   if (error) {
     console.error('Error fetching buses:', error);
@@ -65,14 +211,20 @@ export async function fetchBuses() {
   return data as Bus[];
 }
 
-export async function fetchPassengers() {
-  const { data, error } = await supabase
+export async function fetchPassengers(periodId?: string) {
+  let query = supabase
     .from('passengers')
     .select(`
       *,
       bus:buses(*)
     `)
     .order('created_at', { ascending: false });
+  
+  if (periodId) {
+    query = query.eq('period_id', periodId);
+  }
+  
+  const { data, error } = await query;
   
   if (error) {
     console.error('Error fetching passengers:', error);
@@ -211,10 +363,34 @@ export async function getOccupiedSeats(busId: string) {
   return data as { id: string; gender: 'L' | 'P'; bus_seat_number: number }[];
 }
 
-export async function fetchPassengerCounts() {
+export async function checkSeatAvailability(busId: string, seatNumber: number) {
   const { data, error } = await supabase
     .from('passengers')
+    .select('id')
+    .eq('bus_id', busId)
+    .eq('bus_seat_number', seatNumber)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "The result contains 0 rows"
+    console.error('Error checking seat availability:', error);
+    throw error;
+  }
+  
+  // If data exists, the seat is occupied (return false)
+  // If data is null (error PGRST116), the seat is available (return true)
+  return !data;
+}
+
+export async function fetchPassengerCounts(periodId?: string) {
+  let query = supabase
+    .from('passengers')
     .select('bus_id');
+
+  if (periodId) {
+    query = query.eq('period_id', periodId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching passenger counts:', error);
@@ -246,8 +422,8 @@ export function subscribeToUpdates(
     .subscribe();
 }
 
-export async function generatePassengerExcel() {
-  const passengers = await fetchPassengers();
+export async function generatePassengerExcel(periodId?: string) {
+  const passengers = await fetchPassengers(periodId);
 
   // Group passengers by bus
   const buses = {};

@@ -11,9 +11,10 @@ import { useQueryClient } from '@tanstack/react-query';
 interface AddBusFormProps {
   isOpen: boolean;
   onClose: () => void;
+  periodId: string;
 }
 
-const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
+const AddBusForm = ({ isOpen, onClose, periodId }: AddBusFormProps) => {
   const [destination, setDestination] = useState<string>('');
   const [customDestination, setCustomDestination] = useState<string>('');
   const [maxPassengers, setMaxPassengers] = useState<number>(50);
@@ -41,7 +42,8 @@ const AddBusForm = ({ isOpen, onClose }: AddBusFormProps) => {
         max_passengers: maxPassengers,
         fare_per_passenger: farePerPassenger,
         meal_count: mealCount,
-        meal_price: mealPrice
+        meal_price: mealPrice,
+        period_id: periodId
       });
       
       toast.success('Bus added successfully');

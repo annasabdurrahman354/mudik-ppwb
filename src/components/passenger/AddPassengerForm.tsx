@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { fetchBuses, addPassenger, getAvailableSeatsCount, getOccupiedSeats, PREDEFINED_PASSENGER_STATUS } from '@/lib/supabase';
+import { fetchBuses, addPassenger, getAvailableSeatsCount, getOccupiedSeats, checkSeatAvailability, PREDEFINED_PASSENGER_STATUS } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import BusSeatSelector from './BusSeatSelector';
@@ -14,9 +14,10 @@ import BusSeatSelector from './BusSeatSelector';
 interface AddPassengerFormProps {
   isOpen: boolean;
   onClose: () => void;
+  periodId: string;
 }
 
-const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
+const AddPassengerForm = ({ isOpen, onClose, periodId }: AddPassengerFormProps) => {
   const [name, setName] = useState<string>('');
   const [gender, setGender] = useState<'L' | 'P'>('L');
   const [address, setAddress] = useState<string>('');
@@ -53,7 +54,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
   useEffect(() => {
     const loadBuses = async () => {
       try {
-        const busesData = await fetchBuses();
+        const busesData = await fetchBuses(periodId);
         setBuses(busesData);
         
         // Check availability for each bus
@@ -70,10 +71,10 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
       }
     };
     
-    if (isOpen) {
+    if (isOpen && periodId) {
       loadBuses();
     }
-  }, [isOpen]);
+  }, [isOpen, periodId]);
 
   // Fetch occupied seats when bus is selected
   useEffect(() => {
@@ -185,6 +186,30 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
     
     setIsLoading(true);
     
+    // Check seat availability one last time before submitting
+    try {
+      if (selectedSeatNumber) {
+        const isAvailable = await checkSeatAvailability(busId, selectedSeatNumber);
+        if (!isAvailable) {
+          toast.error(`Kursi nomor ${selectedSeatNumber} sudah tidak tersedia. Mohon pilih kursi lain.`);
+          
+          // Refresh occupied seats to show the latest state
+          const seats = await getOccupiedSeats(busId);
+          setOccupiedSeats(seats);
+          
+          // Deselect the seat
+          setSelectedSeatNumber(null);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking seat availability:', error);
+      toast.error('Gagal memeriksa ketersediaan kursi. Silakan coba lagi.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await addPassenger({
         name,
@@ -199,6 +224,7 @@ const AddPassengerForm = ({ isOpen, onClose }: AddPassengerFormProps) => {
         meal_count: mealCount,
         meal_payment: mealPayment,
         bus_id: busId,
+        period_id: periodId,
       });
       
       toast.success('Penumpang berhasil ditambahkan');

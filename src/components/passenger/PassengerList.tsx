@@ -18,21 +18,27 @@ const TIME_BLOCKS = [
   { start: 18, end: 24, label: '18:00 - 24:00' }
 ];
 
-const PassengerList = () => {
+interface PassengerListProps {
+  activePeriodId?: string;
+}
+
+const PassengerList = ({ activePeriodId }: PassengerListProps) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedBus, setSelectedBus] = useState<string>('all');
   const [selectedGender, setSelectedGender] = useState<string>('all');
   
   // Fetch passenger data
   const { data: passengers = [], isLoading: isLoadingPassengers, refetch: refetchPassengers } = useQuery({
-    queryKey: ['passengers'],
-    queryFn: fetchPassengers
+    queryKey: ['passengers', activePeriodId],
+    queryFn: () => fetchPassengers(activePeriodId),
+    enabled: !!activePeriodId
   });
   
   // Fetch bus data
   const { data: buses = [] } = useQuery({
-    queryKey: ['buses'],
-    queryFn: fetchBuses
+    queryKey: ['buses', activePeriodId],
+    queryFn: () => fetchBuses(activePeriodId),
+    enabled: !!activePeriodId
   });
   
   // Format buses for selection
