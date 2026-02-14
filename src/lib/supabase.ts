@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import ExcelJS from 'exceljs';
 
 // Replace with your Supabase URL and anon key
-const supabaseUrl = 'https://kgxzzkudplrcffvqgxnq.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtneHp6a3VkcGxyY2ZmdnFneG5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MDU0MjYsImV4cCI6MjA4NjQ4MTQyNn0.5Y5sbK2bydpyUoBpcmxjO4xDQYF4skC4U2PCRJUElbs';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
